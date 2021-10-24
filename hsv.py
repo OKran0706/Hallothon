@@ -6,19 +6,34 @@ import pyzbar.pyzbar as pyzbar
 from datetime import datetime
 import time
 ser = serial.Serial('COM4', 9600, timeout=1)
-move=1
+move=0
 from datetime import datetime
 morn = 0
+temp = 0
+b = 0
+detect = 7
+value = 0
+t = 0
+#cloud receive
+import csv
+import receive
+import os
 
 while True:
     timenow = datetime.now()
     current_time = timenow.strftime("%H:%M:%S")
-    if current_time == "3:15:00":
-        detect=3
+    #print(current_time)
+    if current_time[1] == "7" and t == 0:
+
+        move = 1
+        detect=7
         morn=1
-        
+        t=1
         #go to qr 1
     
+    # server.qr = 0
+    # if server(qr)
+
       
     _, frame = cap.read()
     barcodes = pyzbar.decode(frame)
@@ -29,18 +44,57 @@ while True:
             barcodeType = barcode.type
             text = "{} ( {} )".format(barcodeData, barcodeType)
             move=0
-            print(barcodeData)
+            print(barcodeData, morn)
             if morn == 1:
-                if detect == barcodeData:
+                
+                if str(detect) == barcodeData:
+                    print("detector bar code")
+                    ser.write(b'w')
+                    ser.write(b'w')
                     #call face detect func
                     #say hello, goodmorning etc.
-                    
                     exit()
                 else:
-                    break
+                    ser.write(b'w')
+                    print("left bar code")
+                    ser.write(b'w')
+                    move = 1
             
-                ser.write(b'w')
-                ser.write(b'w')
+    if morn == 0:
+        print("morning")
+        b = receive.getMessage()
+        if temp  != b:
+            value = b 
+            temp = b
+        
+        if value == 'mo':
+            print("mo")
+            os.system("robo.mp4")
+            value=0
+            move = 0
+        if value == 'j':
+            print('j')
+            #joke
+            #smile detect in 10s ->sad/->nice smile
+            os.import("python smile.py")
+            value = 0
+            move = 0
+        if value == 'mu':
+            print("mu")
+            #music
+            value = 0
+            move = 0
+        if value == "1":
+            print("kitchen")
+            move = 1
+            value = 0
+        if value == "2":
+            print("room")
+            move = 1
+            value = 0
+
+            ser.write(b'w')
+            ser.write(b'w')
             time.sleep(2)
             ser.write(b'w')
             ser.write(b'w')
