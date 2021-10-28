@@ -1,0 +1,1 @@
+v2.imshow('Video', canvas)
